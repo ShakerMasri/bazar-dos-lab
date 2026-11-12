@@ -1,9 +1,13 @@
 
 import sqlite3
 from pathlib import Path
+import os
 
-DB_PATH = Path(__file__).resolve().parent / "catalog.db"
+DB_PATH = Path(
+    os.getenv("DB_PATH", str(Path(__file__).resolve().parent / "catalog.db"))
+)
 
+DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 def init_db():
     connection = sqlite3.connect(DB_PATH)

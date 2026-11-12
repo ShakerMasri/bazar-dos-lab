@@ -1,9 +1,11 @@
 
 from flask import Flask, jsonify, request
 import sqlite3
-from database import DB_PATH
+from database import DB_PATH, init_db
 
 app = Flask(__name__)
+
+init_db()
 
 
 @app.get("/health")

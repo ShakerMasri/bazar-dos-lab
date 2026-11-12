@@ -1,0 +1,21 @@
+services:
+  catalog:
+    build: ./catalog
+    ports:
+      - "5001:5000"
+    environment:
+      DB_PATH: /data/catalog.db
+    volumes:
+      - catalog-data:/data
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5000:5000"
+    environment:
+      CATALOG_URL: http://catalog:5000
+    depends_on:
+      - catalog
+
+volumes:
+  catalog-data:
