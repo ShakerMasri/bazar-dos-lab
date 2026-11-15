@@ -1,0 +1,131 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"></head><body>
+<h1 id="bazar.com---distributed-online-book-store">Bazar.com -
+Distributed Online Book Store</h1>
+<h2
+id="distributed-and-operating-systems---lab-1-design-report">Distributed
+and Operating Systems - Lab 1 Design Report</h2>
+<p><strong>System:</strong> Bazar.com | <strong>Architecture:</strong>
+Two tiers, three independent microservices<br />
+<strong>Implementation:</strong> Python, Flask, HTTP REST, SQLite, Linux
+Docker containers, Docker Compose</p>
+<h3 id="purpose-and-architecture">1. Purpose and architecture</h3>
+<p>Bazar.com demonstrates a small distributed bookstore with four books
+and two categories: <em>distributed systems</em> (books 1 and 2) and
+<em>undergraduate school</em> (books 3 and 4). The assignment requires
+<code>search(topic)</code>, <code>info(item_number)</code>, and
+<code>purchase(item_number)</code>. The implementation has <strong>two
+logical tiers</strong>, not three: a client-facing Frontend tier and a
+backend tier containing the independently running Catalog and Order
+microservices.</p>
+<pre class="text"><code>Host CLI / curl
+       |
+       v
+ Frontend (HTTP :5000)
+   |             |
+   | GET         | POST
+   v             v
+ Catalog &lt;---- Order
+   |   HTTP       |
+ SQLite       SQLite
+ volume       volume</code></pre>
+<p>Frontend forwards search and information requests to Catalog and
+purchase requests to Order. Order communicates directly with Catalog
+over the Docker Compose network. Each component runs in a separate Linux
+container. The host reaches Frontend at <code>127.0.0.1:5000</code>;
+Catalog is additionally exposed on host port <code>5001</code> for
+direct API testing. Docker’s internal DNS resolves backend hostnames
+such as <code>catalog</code> without hard-coding changing container IP
+addresses.</p>
+<h3 id="service-responsibilities-and-rest-api">2. Service
+responsibilities and REST API</h3>
+<p><strong>Catalog:</strong> The existing SQLite database stores each
+book’s ID, title, topic, price, and quantity.
+<code>GET /search/&lt;topic&gt;</code> returns matching titles and IDs.
+<code>GET /info/&lt;id&gt;</code> returns a book’s title, price and
+quantity (or HTTP 404). <code>PATCH /update/&lt;id&gt;</code> changes
+the price via <code>{"price": integer}</code> or inventory via
+<code>{"stock_delta": integer}</code>. Negative prices, invalid deltas,
+and insufficient stock are rejected.</p>
+<p><strong>Frontend:</strong> <code>GET /search/&lt;topic&gt;</code>,
+<code>GET /info/&lt;id&gt;</code>, and
+<code>POST /purchase/&lt;id&gt;</code> forward requests to the correct
+backend, return JSON, and preserve HTTP status codes. Requests use
+timeouts; unavailable backends produce errors rather than hanging
+indefinitely.</p>
+<p><strong>Order:</strong> <code>POST /purchase/&lt;id&gt;</code> first
+calls Catalog’s information endpoint over HTTP. If no stock remains, it
+returns HTTP 409. Otherwise it requests
+<code>PATCH /update/&lt;id&gt;</code> with <code>stock_delta: -1</code>.
+A successful decrement is followed by an insertion into a separate
+SQLite <code>orders</code> table containing order ID, book ID, title,
+price, status, and timestamp. Success returns a JSON message beginning
+with <code>bought book ...</code>. The order file persists in its own
+Docker volume.</p>
+<h3 id="concurrency-persistence-and-failure-behavior">3. Concurrency,
+persistence, and failure behavior</h3>
+<p>Multiple clients may issue requests concurrently. A straightforward
+read-then-write on Catalog stock can oversell the final copy. The
+existing Catalog code instead issues a <em>single conditional SQLite
+update</em>:
+<code>UPDATE books SET quantity = quantity + ? WHERE id = ? AND quantity + ? &gt;= 0</code>.
+SQLite serializes competing writers, and a second request cannot
+decrement zero stock. Order must check the response from this final
+atomic update even if its earlier availability check was positive. A
+temporary test environment with only one copy is used to demonstrate
+that two concurrent purchase attempts should yield one HTTP 200 and one
+HTTP 409, zero remaining stock, and one completed order.</p>
+<p>Docker named volumes <code>catalog-data</code> and
+<code>order-data</code> retain SQLite data outside container writable
+layers. The validation script checks stock and order records before and
+after restarting all three containers. This is a demonstration of
+persistence across container restarts; deleting volumes intentionally
+destroys those databases.</p>
+<p>If Catalog is unreachable, the gateway or Order returns a controlled
+service-unavailable response. <strong>Known limitation:</strong>
+Catalog’s decrement and Order’s insert are separate transactions. If the
+Order database insert fails after a successful decrement, stock may be
+reduced without a saved order. A timeout after Catalog commits can also
+leave an uncertain result. The implementation reports these cases but
+does not provide automatic compensation, exactly-once semantics, or
+distributed transactions.</p>
+<h3 id="deployment-verification-and-logs">4. Deployment, verification,
+and logs</h3>
+<p><code>docker compose up -d --build</code> builds and starts the three
+services; <code>docker compose ps</code> displays their status. A client
+on the host operating system can issue
+<code>curl http://127.0.0.1:5000/info/2</code> or run
+<code>python client/bazar_cli.py search 'distributed systems'</code>.
+The client formats query output and purchase messages; service logs show
+corresponding requests, stock changes (from Catalog access logs and API
+output), and successful purchase messages from Order.</p>
+<p>The reproducible isolated test command is
+<code>bash tests/run_validation.sh</code>. It runs with distinct test
+project containers, test databases and alternate host ports, then
+creates <code>docs/sample-output.txt</code> from actual execution and
+retains the service logs in <code>docs/service-logs.txt</code>. No
+results are claimed until the script has been executed successfully in a
+Docker-enabled environment. The original Catalog tests remain available
+for direct API testing but may change persistent stock.</p>
+<h3 id="tradeoffs-and-possible-extensions">5. Tradeoffs and possible
+extensions</h3>
+<p>Flask and SQLite minimize setup and complexity. REST and JSON make
+service boundaries explicit, at the cost of network latency and
+temporary failures. SQLite supports small workloads and atomic local
+inventory updates but limits concurrent writers compared with a larger
+database. Docker Compose makes local deployment repeatable but is not a
+multi-machine orchestrator. An improved design would use unique purchase
+identifiers for idempotent retries, an order state machine and
+reconciliation/compensation for partial failures, stronger
+failure-injection tests, production WSGI servers, and health-checked
+startup. Authentication, payments, caching, replication, and
+high-availability deployment are intentionally outside the scope of this
+first lab.</p>
+<h3 id="conclusion">6. Conclusion</h3>
+<p>Bazar.com is designed to meet Lab 1’s core requirements: four-book
+Catalog, REST-based Frontend and Order workflows, three separately
+containerized services, persistent Catalog and order records,
+stock-update concurrency protection, and reproducible host-client tests.
+Its intentionally limited cross-service transaction guarantees are
+explicitly documented so the demonstration distinguishes tested behavior
+from production reliability.</p>
+</body></html>

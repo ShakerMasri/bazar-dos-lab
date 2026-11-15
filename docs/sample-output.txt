@@ -1,0 +1,47 @@
+BAZAR.COM ISOLATED EXECUTION EVIDENCE
+Target: http://127.0.0.1:5100
+Docker Compose test project: shaker_bazar_validation
+Tests use disposable test volumes; NOT the real bookstore database.
+
+SECTION A: HOST CLIENT / REST APIS
+GET http://127.0.0.1:5100/search/distributed%20systems -> HTTP 200: [{"id": 1, "title": "How to get a good grade in DOS in 40 minutes a day"}, {"id": 2, "title": "RPCs for Noobs"}]
+GET http://127.0.0.1:5100/search/undergraduate%20school -> HTTP 200: [{"id": 3, "title": "Xen and the Art of Surviving Undergraduate School"}, {"id": 4, "title": "Cooking for the Impatient Undergrad"}]
+GET http://127.0.0.1:5100/search/nonexistent -> HTTP 200: []
+GET http://127.0.0.1:5100/info/2 -> HTTP 200: {"price": 50, "quantity": 5, "title": "RPCs for Noobs"}
+GET http://127.0.0.1:5100/info/999 -> HTTP 404: {"error": "Book not found"}
+POST http://127.0.0.1:5100/purchase/999 -> HTTP 404: {"error": "Book not found"}
+READ-ONLY AND INVALID-ID API TESTS PASSED
+
+SECTION B: CATALOG PRICE AND INVENTORY UPDATE
+GET http://127.0.0.1:5101/info/3 -> HTTP 200: {"price": 45, "quantity": 5, "title": "Xen and the Art of Surviving Undergraduate School"}
+PATCH http://127.0.0.1:5101/update/3 -> HTTP 200: {"message": "Price updated", "price": 46}
+GET http://127.0.0.1:5101/info/3 -> HTTP 200: {"price": 46, "quantity": 5, "title": "Xen and the Art of Surviving Undergraduate School"}
+PATCH http://127.0.0.1:5101/update/3 -> HTTP 200: {"message": "Price updated", "price": 45}
+PATCH http://127.0.0.1:5101/update/3 -> HTTP 200: {"message": "Stock updated", "quantity": 7}
+GET http://127.0.0.1:5101/info/3 -> HTTP 200: {"price": 45, "quantity": 7, "title": "Xen and the Art of Surviving Undergraduate School"}
+PATCH http://127.0.0.1:5101/update/3 -> HTTP 200: {"message": "Stock updated", "quantity": 5}
+PATCH http://127.0.0.1:5101/update/3 -> HTTP 409: {"error": "Insufficient stock"}
+GET http://127.0.0.1:5101/info/3 -> HTTP 200: {"price": 45, "quantity": 5, "title": "Xen and the Art of Surviving Undergraduate School"}
+CATALOG UPDATE TESTS PASSED
+
+SECTION C: FULL CONCURRENT PURCHASE
+GET http://127.0.0.1:5101/info/4 -> HTTP 200: {"price": 30, "quantity": 5, "title": "Cooking for the Impatient Undergrad"}
+PATCH http://127.0.0.1:5101/update/4 -> HTTP 200: {"message": "Stock updated", "quantity": 1}
+GET http://127.0.0.1:5100/info/4 -> HTTP 200: {"price": 30, "quantity": 1, "title": "Cooking for the Impatient Undergrad"}
+Purchase request 1: HTTP 200: {'book_id': 4, 'message': 'bought book Cooking for the Impatient Undergrad', 'order_id': 1, 'price': 30, 'remaining_quantity': 0}
+Purchase request 2: HTTP 409: {'error': 'Book out of stock'}
+GET http://127.0.0.1:5100/info/4 -> HTTP 200: {"price": 30, "quantity": 0, "title": "Cooking for the Impatient Undergrad"}
+POST http://127.0.0.1:5100/purchase/4 -> HTTP 409: {"error": "Book out of stock"}
+FULL PURCHASE CONCURRENCY TEST PASSED: 1 success, 1 conflict, 0 stock, 1 order
+
+SECTION D: PERSISTENCE AFTER RESTART
+ Container shaker_bazar_validation-catalog-1 Restarting
+ Container shaker_bazar_validation-frontend-1 Restarting
+ Container shaker_bazar_validation-order-1 Restarting
+ Container shaker_bazar_validation-order-1 Started
+ Container shaker_bazar_validation-frontend-1 Started
+ Container shaker_bazar_validation-catalog-1 Started
+GET http://127.0.0.1:5100/info/4 -> HTTP 200: {"price": 30, "quantity": 0, "title": "Cooking for the Impatient Undergrad"}
+PERSISTENCE TEST PASSED: stock=0, completed orders=1
+
+ALL ISOLATED VALIDATION CHECKS PASSED
