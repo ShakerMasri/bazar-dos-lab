@@ -2,20 +2,38 @@ services:
   catalog:
     build: ./catalog
     ports:
-      - "5001:5000"
+      - "127.0.0.1:${CATALOG_HOST_PORT:-5001}:5000"
     environment:
       DB_PATH: /data/catalog.db
     volumes:
       - catalog-data:/data
+    restart: unless-stopped
+
+  order:
+    build: ./order
+    environment:
+      CATALOG_URL: http://catalog:5000
+      ORDER_DB_PATH: /data/orders.db
+    volumes:
+      - order-data:/data
+    expose:
+      - "5000"
+    depends_on:
+      - catalog
+    restart: unless-stopped
 
   frontend:
     build: ./frontend
     ports:
-      - "5000:5000"
+      - "127.0.0.1:${FRONTEND_HOST_PORT:-5000}:5000"
     environment:
       CATALOG_URL: http://catalog:5000
+      ORDER_URL: http://order:5000
     depends_on:
       - catalog
+      - order
+    restart: unless-stopped
 
 volumes:
   catalog-data:
+  order-data:

@@ -1,0 +1,104 @@
+catalog-1  |  * Serving Flask app 'app'
+catalog-1  |  * Debug mode: off
+catalog-1  | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+catalog-1  |  * Running on all addresses (0.0.0.0)
+catalog-1  |  * Running on http://127.0.0.1:5000
+catalog-1  |  * Running on http://172.19.0.2:5000
+catalog-1  | [33mPress CTRL+C to quit[0m
+catalog-1  | 172.19.0.1 - - [15/Nov/2026 15:38:36] "GET /health HTTP/1.1" 200 -
+catalog-1  | 172.19.0.4 - - [15/Nov/2026 15:38:36] "GET /search/distributed%20systems HTTP/1.1" 200 -
+catalog-1  | 172.19.0.4 - - [15/Nov/2026 15:38:36] "GET /search/undergraduate%20school HTTP/1.1" 200 -
+catalog-1  | 172.19.0.4 - - [15/Nov/2026 15:38:36] "GET /search/nonexistent HTTP/1.1" 200 -
+catalog-1  | 172.19.0.4 - - [15/Nov/2026 15:38:36] "GET /info/2 HTTP/1.1" 200 -
+catalog-1  | 172.19.0.4 - - [15/Nov/2026 15:38:36] "[33mGET /info/999 HTTP/1.1[0m" 404 -
+catalog-1  | 172.19.0.3 - - [15/Nov/2026 15:38:36] "[33mGET /info/999 HTTP/1.1[0m" 404 -
+catalog-1  | 172.19.0.1 - - [15/Nov/2026 15:38:36] "GET /info/3 HTTP/1.1" 200 -
+catalog-1  | 172.19.0.1 - - [15/Nov/2026 15:38:36] "PATCH /update/3 HTTP/1.1" 200 -
+catalog-1  | 172.19.0.1 - - [15/Nov/2026 15:38:36] "GET /info/3 HTTP/1.1" 200 -
+catalog-1  | 172.19.0.1 - - [15/Nov/2026 15:38:36] "PATCH /update/3 HTTP/1.1" 200 -
+catalog-1  | 172.19.0.1 - - [15/Nov/2026 15:38:36] "PATCH /update/3 HTTP/1.1" 200 -
+catalog-1  | 172.19.0.1 - - [15/Nov/2026 15:38:36] "GET /info/3 HTTP/1.1" 200 -
+catalog-1  | 172.19.0.1 - - [15/Nov/2026 15:38:36] "PATCH /update/3 HTTP/1.1" 200 -
+catalog-1  | 172.19.0.1 - - [15/Nov/2026 15:38:36] "[31m[1mPATCH /update/3 HTTP/1.1[0m" 409 -
+catalog-1  | 172.19.0.1 - - [15/Nov/2026 15:38:36] "GET /info/3 HTTP/1.1" 200 -
+catalog-1  | 172.19.0.1 - - [15/Nov/2026 15:38:36] "GET /info/4 HTTP/1.1" 200 -
+catalog-1  | 172.19.0.1 - - [15/Nov/2026 15:38:36] "PATCH /update/4 HTTP/1.1" 200 -
+catalog-1  | 172.19.0.4 - - [15/Nov/2026 15:38:36] "GET /info/4 HTTP/1.1" 200 -
+catalog-1  | 172.19.0.3 - - [15/Nov/2026 15:38:36] "GET /info/4 HTTP/1.1" 200 -
+catalog-1  | 172.19.0.3 - - [15/Nov/2026 15:38:36] "GET /info/4 HTTP/1.1" 200 -
+catalog-1  | 172.19.0.3 - - [15/Nov/2026 15:38:36] "PATCH /update/4 HTTP/1.1" 200 -
+catalog-1  | 172.19.0.3 - - [15/Nov/2026 15:38:36] "[31m[1mPATCH /update/4 HTTP/1.1[0m" 409 -
+catalog-1  | 172.19.0.4 - - [15/Nov/2026 15:38:36] "GET /info/4 HTTP/1.1" 200 -
+catalog-1  | 172.19.0.3 - - [15/Nov/2026 15:38:36] "GET /info/4 HTTP/1.1" 200 -
+catalog-1  |  * Serving Flask app 'app'
+catalog-1  |  * Debug mode: off
+catalog-1  | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+catalog-1  |  * Running on all addresses (0.0.0.0)
+catalog-1  |  * Running on http://127.0.0.1:5000
+catalog-1  |  * Running on http://172.19.0.4:5000
+catalog-1  | [33mPress CTRL+C to quit[0m
+catalog-1  | 172.19.0.2 - - [15/Nov/2026 15:38:41] "GET /info/4 HTTP/1.1" 200 -
+frontend-1  |  * Serving Flask app 'app'
+frontend-1  |  * Debug mode: off
+frontend-1  | INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+frontend-1  |  * Running on all addresses (0.0.0.0)
+frontend-1  |  * Running on http://127.0.0.1:5000
+frontend-1  |  * Running on http://172.19.0.4:5000
+frontend-1  | INFO:werkzeug:[33mPress CTRL+C to quit[0m
+frontend-1  | INFO:werkzeug:172.19.0.1 - - [15/Nov/2026 15:38:36] "GET /health HTTP/1.1" 200 -
+frontend-1  | INFO:app:Frontend search requested: distributed systems
+frontend-1  | INFO:werkzeug:172.19.0.1 - - [15/Nov/2026 15:38:36] "GET /search/distributed%20systems HTTP/1.1" 200 -
+frontend-1  | INFO:app:Frontend search requested: undergraduate school
+frontend-1  | INFO:werkzeug:172.19.0.1 - - [15/Nov/2026 15:38:36] "GET /search/undergraduate%20school HTTP/1.1" 200 -
+frontend-1  | INFO:app:Frontend search requested: nonexistent
+frontend-1  | INFO:werkzeug:172.19.0.1 - - [15/Nov/2026 15:38:36] "GET /search/nonexistent HTTP/1.1" 200 -
+frontend-1  | INFO:app:Frontend book info requested: 2
+frontend-1  | INFO:werkzeug:172.19.0.1 - - [15/Nov/2026 15:38:36] "GET /info/2 HTTP/1.1" 200 -
+frontend-1  | INFO:app:Frontend book info requested: 999
+frontend-1  | INFO:werkzeug:172.19.0.1 - - [15/Nov/2026 15:38:36] "[33mGET /info/999 HTTP/1.1[0m" 404 -
+frontend-1  | INFO:app:Frontend purchase requested: 999
+frontend-1  | INFO:werkzeug:172.19.0.1 - - [15/Nov/2026 15:38:36] "[33mPOST /purchase/999 HTTP/1.1[0m" 404 -
+frontend-1  | INFO:app:Frontend book info requested: 4
+frontend-1  | INFO:werkzeug:172.19.0.1 - - [15/Nov/2026 15:38:36] "GET /info/4 HTTP/1.1" 200 -
+frontend-1  | INFO:app:Frontend purchase requested: 4
+frontend-1  | INFO:app:Frontend purchase requested: 4
+frontend-1  | INFO:werkzeug:172.19.0.1 - - [15/Nov/2026 15:38:36] "POST /purchase/4 HTTP/1.1" 200 -
+frontend-1  | INFO:werkzeug:172.19.0.1 - - [15/Nov/2026 15:38:36] "[31m[1mPOST /purchase/4 HTTP/1.1[0m" 409 -
+frontend-1  | INFO:app:Frontend book info requested: 4
+frontend-1  | INFO:werkzeug:172.19.0.1 - - [15/Nov/2026 15:38:36] "GET /info/4 HTTP/1.1" 200 -
+frontend-1  | INFO:app:Frontend purchase requested: 4
+frontend-1  | INFO:werkzeug:172.19.0.1 - - [15/Nov/2026 15:38:36] "[31m[1mPOST /purchase/4 HTTP/1.1[0m" 409 -
+frontend-1  |  * Serving Flask app 'app'
+frontend-1  |  * Debug mode: off
+frontend-1  | INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+frontend-1  |  * Running on all addresses (0.0.0.0)
+frontend-1  |  * Running on http://127.0.0.1:5000
+frontend-1  |  * Running on http://172.19.0.2:5000
+frontend-1  | INFO:werkzeug:[33mPress CTRL+C to quit[0m
+frontend-1  | INFO:werkzeug:172.19.0.1 - - [15/Nov/2026 15:38:41] "GET /health HTTP/1.1" 200 -
+frontend-1  | INFO:app:Frontend book info requested: 4
+frontend-1  | INFO:werkzeug:172.19.0.1 - - [15/Nov/2026 15:38:41] "GET /info/4 HTTP/1.1" 200 -
+order-1     |  * Serving Flask app 'app'
+order-1     |  * Debug mode: off
+order-1     | INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+order-1     |  * Running on all addresses (0.0.0.0)
+order-1     |  * Running on http://127.0.0.1:5000
+order-1     |  * Running on http://172.19.0.3:5000
+order-1     | INFO:werkzeug:[33mPress CTRL+C to quit[0m
+order-1     | INFO:app:Order purchase requested: 999
+order-1     | INFO:werkzeug:172.19.0.4 - - [15/Nov/2026 15:38:36] "[33mPOST /purchase/999 HTTP/1.1[0m" 404 -
+order-1     | INFO:app:Order purchase requested: 4
+order-1     | INFO:app:Order purchase requested: 4
+order-1     | INFO:app:bought book Cooking for the Impatient Undergrad (order 1)
+order-1     | INFO:werkzeug:172.19.0.4 - - [15/Nov/2026 15:38:36] "POST /purchase/4 HTTP/1.1" 200 -
+order-1     | INFO:werkzeug:172.19.0.4 - - [15/Nov/2026 15:38:36] "[31m[1mPOST /purchase/4 HTTP/1.1[0m" 409 -
+order-1     | INFO:app:Order purchase requested: 4
+order-1     | INFO:app:Purchase rejected (out of stock): 4
+order-1     | INFO:werkzeug:172.19.0.4 - - [15/Nov/2026 15:38:36] "[31m[1mPOST /purchase/4 HTTP/1.1[0m" 409 -
+order-1     |  * Serving Flask app 'app'
+order-1     |  * Debug mode: off
+order-1     | INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+order-1     |  * Running on all addresses (0.0.0.0)
+order-1     |  * Running on http://127.0.0.1:5000
+order-1     |  * Running on http://172.19.0.3:5000
+order-1     | INFO:werkzeug:[33mPress CTRL+C to quit[0m
